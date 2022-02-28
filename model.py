@@ -13,6 +13,12 @@ import tensorflow.keras.backend as K
 import pywt
 import pywt.data
 import torch
+from keras.losses import mean_squared_error
+
+def bce_dice_loss(y_true, y_pred, bce_weight=1., smooth=0.0001, per_image=True):
+    bce = K.mean(binary_crossentropy(y_true, y_pred))
+    loss = bce_weight * bce + dice_loss(y_true, y_pred, smooth=smooth, per_image=per_image)
+    return loss
 
 def attention_block_2d(x, g, inter_channel, data_format='channels_last'):
     # theta_x(?,g_height,g_width,inter_channel)
