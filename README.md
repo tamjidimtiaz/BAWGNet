@@ -10,4 +10,4 @@
 
 ![histo_pathology_image](https://github.com/tamjidimtiaz/Shape-Aware-Wavelet-Guided-U-net-to-Detect-Cell-Nuclei-in-Microscopy-Images/blob/4ff056c80079fd1e44b5ba034747ac37e6b19697/00ae65c1c6631ae6f2be1a449902976e6eb8483bf6b0740d00530220832c6d3e.png)
 
-
+![shape_constraint_map](https://github.com/tamjidimtiaz/Shape-Aware-Wavelet-Guided-U-net-to-Detect-Cell-Nuclei-in-Microscopy-Images/blob/efec9e4098cf1d857693c9c3c864b6d97a727005/shape_constraint_map.PNG)
