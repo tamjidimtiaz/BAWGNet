@@ -6,7 +6,7 @@
 
 2. Simplified diagram of the proposed architecture
 
-![simplified diagram modified version 2](https://github.com/tamjidimtiaz/Shape-Aware-Wavelet-Guided-U-net-to-Detect-Cell-Nuclei-in-Microscopy-Images/blob/4ff056c80079fd1e44b5ba034747ac37e6b19697/simplified%20diagram%20modified%20version%202.png)
+![simplified diagram modified version 2](https://github.com/tamjidimtiaz/Boundary-Aware-Wavelet-Guided-U-net-to-Detect-Cell-Nuclei-in-Microscopy-Images/blob/b1fca84d5b092eaba5c95ee5ce8c0ff5746aff4b/simplified%20diagram%20modified%20version%202.png)
 
 3. Detailed diagram of the proposed architecture
 
