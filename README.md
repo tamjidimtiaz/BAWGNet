@@ -10,7 +10,7 @@
 
 3. Detailed diagram of the proposed architecture
 
-![flowchart_updated_new](https://github.com/tamjidimtiaz/Shape-Aware-Wavelet-Guided-U-net-to-Detect-Cell-Nuclei-in-Microscopy-Images/blob/4ff056c80079fd1e44b5ba034747ac37e6b19697/flowchart_updated_new.png)
+![flowchart_updated_new](https://github.com/tamjidimtiaz/Boundary-Aware-Wavelet-Guided-U-net-to-Detect-Cell-Nuclei-in-Microscopy-Images/blob/48b0082683aebced137255ccac4c2605a3fc7a97/flowchart_updated_new.png)
 
 4. Attention mechanism to guide the spatial information through wavelet information
 
