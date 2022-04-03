@@ -47,27 +47,27 @@ def attention_block_2d(x, g, inter_channel, data_format='channels_last'):
 
     return att_x
 
-def Shape_aware_unit(inputs, inter_channel, data_format):
+def Boundary_aware_unit(inputs, inter_channel, data_format):
     
     conv1 = Conv2D(inter_channel, (1, 1), padding='same',data_format=data_format)(inputs)
     conv2 = Conv2D(inter_channel/2, (3, 3), padding='same',data_format=data_format)(conv1)
     conv3 = Conv2D(inter_channel/4, (3, 3), padding='same',data_format=data_format)(conv2)
     conca = tf.keras.layers.Concatenate(axis=3)([inputs, conv3])
-    out_shape = Conv2D(16, (1, 1), padding='same',data_format=data_format)(conv2)
+    out_boundary = Conv2D(16, (1, 1), padding='same',data_format=data_format)(conv2)
 
-    return conca, out_shape
+    return conca, out_boundary
 
-def shape_fusion(out_shape1, out_shape2, out_shape3):
-    out_shape1 = UpSampling2D(size=(8, 8), data_format='channels_last', interpolation='bilinear', name='shape11')(
+def boundary_fusion(out_shape1, out_shape2, out_shape3):
+    out_boundary1 = UpSampling2D(size=(8, 8), data_format='channels_last', interpolation='bilinear', name='shape11')(
         out_shape1)
-    out_shape2 = UpSampling2D(size=(4, 4), data_format='channels_last', interpolation='bilinear', name='shape22')(
+    out_boundary2 = UpSampling2D(size=(4, 4), data_format='channels_last', interpolation='bilinear', name='shape22')(
         out_shape2)
-    out_shape3 = UpSampling2D(size=(2, 2), data_format='channels_last', interpolation='bilinear', name='shape33')(
+    out_boundary3 = UpSampling2D(size=(2, 2), data_format='channels_last', interpolation='bilinear', name='shape33')(
         out_shape3)
-    shape_fuse = concatenate([out_shape1, out_shape2, out_shape3], axis=3, name='cc5')
-    out_shape = Conv2D(filters=1, kernel_size=(1, 1), activation='sigmoid', name='out_shape',
-                       kernel_initializer='he_normal')(shape_fuse)
-    return out_shape
+    boundary_fuse = concatenate([out_boundary1, out_boundary2, out_boundary3], axis=3, name='cc5')
+    out_boundary = Conv2D(filters=1, kernel_size=(1, 1), activation='sigmoid', name='out_boundary',
+                       kernel_initializer='he_normal')(boundary_fuse)
+    return out_boundary
 
 def wavelet_concat(LH, HL, HH, FM, FU, FD, inter_channel, data_format='channels_last'):
 
@@ -88,8 +88,8 @@ def wavelet_concat(LH, HL, HH, FM, FU, FD, inter_channel, data_format='channels_
     # print(F1.shape)
     F = add([F, F1])
     F = attention_block_2d(F, W, inter_channel = F.get_shape().as_list()[3], data_format='channels_last')
-    conca, out_shape = Shape_aware_unit(F, inter_channel, data_format)
-    return conca, out_shape
+    conca, out_boundary = Boundary_aware_unit(F, inter_channel, data_format)
+    return conca, out_boundary
 
 
 def dwt(x, data_format='channels_last'):
@@ -124,7 +124,7 @@ def dwt(x, data_format='channels_last'):
         return x_LL,x_LH,x_HL,x_HH
 
 
-def SAWGUnet(img_w, img_h, n_label, data_format='channels_last', features=8):
+def BAWGnet(img_w, img_h, n_label, data_format='channels_last', features=8):
 
 
 
@@ -187,26 +187,26 @@ def SAWGUnet(img_w, img_h, n_label, data_format='channels_last', features=8):
     Ffinal = Conv2D(1, (1, 1), padding='same', data_format=data_format)(U4)
     Ffinal = core.Activation('sigmoid')(Ffinal)
 
-    M1, shape_1 = wavelet_concat(LH3, HL3, HH3, U1, FD3, C51, features*4, data_format=data_format)
-    M2, shape_2 = wavelet_concat(LH2, HL2, HH2, M1, FD2, C61, features*2, data_format=data_format)
-    M3, shape_3 = wavelet_concat(LH1, HL1, HH1, M2, FD1, C71, features, data_format=data_format)
+    M1, boundary_1 = wavelet_concat(LH3, HL3, HH3, U1, FD3, C51, features*4, data_format=data_format)
+    M2, boundary_2 = wavelet_concat(LH2, HL2, HH2, M1, FD2, C61, features*2, data_format=data_format)
+    M3, boundary_3 = wavelet_concat(LH1, HL1, HH1, M2, FD1, C71, features, data_format=data_format)
 
-    shape_fused = shape_fusion(shape_1, shape_2, shape_3)
-    shape_fused = Conv2D(1, (1, 1), padding='same', data_format=data_format)(shape_fused)
-    shape_fused = core.Activation('sigmoid')(shape_fused)
+    boundary_fused = shape_fusion(boundary_1, boundary_2, boundary_3)
+    boundary_fused = Conv2D(1, (1, 1), padding='same', data_format=data_format)(boundary_fused)
+    boundary_fused = core.Activation('sigmoid')(boundary_fused)
 
 
     M3 = UpSampling2D(size=(2, 2), data_format=data_format)(M3)
     Mfinal = Conv2D(1, (1, 1), padding='same', data_format=data_format)(M3)
     Mfinal = core.Activation('sigmoid')(Mfinal)   
     
-    model = Model(inputs=inp, outputs=[Mfinal, Ffinal, shape_fused], name='Unet_DSRN')
+    model = Model(inputs=inp, outputs=[Mfinal, Ffinal, boundary_fused], name='Unet_DSRN')
 
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), loss=[bce_dice_loss, bce_dice_loss, mean_squared_error], loss_weights= [1., 1., 1.], metrics=dice_coefficient)
 
     return model
   
  
-model1 = SAWGUnet(256, 256, 3, data_format='channels_last', features = 8)
+model1 = BAWGnet(256, 256, 3, data_format='channels_last', features = 8)
 model1.summary()
 history1 = model1.fit(X_train, [Y_train.astype('float32'), Y_train.astype('float32'), Y_train.astype('float32')], batch_size = 16, validation_split=0.1,  epochs= 70, shuffle=True, callbacks = callbacks_list)
