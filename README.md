@@ -1,4 +1,4 @@
-# Boundary-Aware-Wavelet-Guided-U-net-to-Detect-Cell-Nuclei-in-Histopathology-Images
+# BAWGNet: Boundary Aware Wavelet Guided Network for the Nuclei Segmentation in Histopathology Images
 
 1. Preprocessing steps involved in this work.
 
